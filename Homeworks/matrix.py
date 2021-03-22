@@ -302,6 +302,12 @@ class Matrix(object):
             self_row = self[y + from_row]
             for x, value in enumerate(row):
                 self_row[x + from_col] = value
+    
+    def add_submatrix(self, from_row: int, from_col: int, A: Matrix):
+        for y, row in enumerate(A):
+            self_row = self[y + from_row]
+            for x, value in enumerate(row):
+                self_row[x + from_col] += value
 
     def __repr__(self):
         return '\n'.join('{}'.format(row) for row in self._A)
