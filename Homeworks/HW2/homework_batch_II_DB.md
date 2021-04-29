@@ -99,23 +99,60 @@ Correctness of the algorithm is pretty self explanatory and proved just by follo
 
 (c) Assuming that there is only a constant number of values in A different from 0, write an efficient algorithm to solve the problem, evaluate its complexity and correctness.
 
-Let $k$ be the total number of values in A that are different from 0. The strategy I opted to follow in order to enhance the complexity of the previously presented algorithm was to copy all the k elements different from 0 into an auxiliary array _AUX_ and then to perform the very same algorithm on that specific array.
-The pseudocode here below shows the procedure:
+Let $k$ be the total number of values in A that are different from $0$. The strategy I opted to follow in order to enhance the complexity of the previously presented algorithm was to copy all the $k$ elements different from $0$ into an auxiliary array _AUX_ and as first step to apply previous algorithm on this newly generated array. Then I operated another linear scan of the input array using a for loop and, taking advantage of some auxiliary indexes, I computed resulting values of the output array B following the procedure described in the pseudocode below:
 
 ``` imporved
-def improved(A):
+def improved(A, k):
     AUX <- array(A.size, default = 0)
+    B <- array(A.size, default = 0)
+    zeros <- A.size - k 
+    neg <- 0
+
     for i <- 1 to A.size:
         if A[i] != 0:
             AUX[i] = A[i]
         endif
+        if A[i] < 0:
+            neg <- neg + 1
+        endif
     endfor
 
-    return smallerThan(AUX)
+    B_AUX = smallerThan(AUX)
+    i_AUX <- 1
+
+    for i <- 1 to A.size:
+        if A[i] > 0:
+            B[i] = zeros + B_AUX[i_AUX]
+            i_AUX <- i_AUX + 1
+        endif
+        if A[i] = 0:
+            B[i] = neg
+            zeros <- zeros - 1
+        endif
+        else:
+            B[i] = B_AUX[i_AUX]
+            i_AUX <- i_AUX + 1
+            neg <- neg - 1
+        endelse
+
+    return B
 enddef
 ```
 
-Complexity in this case is equal to $\theta(n) + O(k^2)$ (respectively related to the first for loop and _smallerThan_ function execution) and we can immediately notice the benefits from this kind of approach. Since $k$ is a constant number and independent from $n$, $O(k^2)$ becomes negligible and so the resulting complexity will be $\theta(n)$.
+It's possible to prove the correctness of the algorithm by taking into account a brief example. Let's consider the array `A=[2,-1,3,0,-1,-2,0,7]`, so $k=6$ and `zeros=2`; from first loop we have that `AUX=[2,-1,3,-1,-2,7]` and `neg=3`; after this step we can compute B_AUX which is equal to `B_AUX=[3,1,2,1,0,0]`. Then we can procede with the second loop:
+
+* since `A[1] > 0`, `B[1] = zeros + B_AUX[1] = 2 + 3 = 5`; still we have to increase `i_AUX to 2`
+* `A[2] < 0`, `B[2] = B_AUX[2] = 1`; let's decrease `neg to 2` and increase `i_AUX to 3`
+* `A[3] > 0`, `B[3] = zeros + B_AUX[3] = 2 + 2 = 4`; still we have to increase `i_AUX to 4`
+* `A[4] = 0`, `B[4] = neg = 2`; we decrease `zeros to 1`
+* `A[5] < 0`, `B[5] = B_AUX[4] = 1`; we decrease `neg to 1` and increase `i_AUX to 5`
+* `A[6] < 0`, `B[6] = B_AUX[5] = 0`; we decrease `neg to 0` and increase `i_AUX to 6`
+* `A[7] = 0`, `B[7] = neg = 0`; we decrease `zeros to 0`
+* `A[8] > 0`, `B[8] = zeros + B_AUX[6] = 0 + 0 = 0` and we increase `i_AUX to 7`
+  
+After all these steps, we have that `B=[5,1,4,2,1,0,0,0]`, which is the correct result.
+
+Complexity in this case is equal to $2*\theta(n) + O(k^2)$ (respectively related to the two loops and _smallerThan_ function execution). Since $k$ is a constant number and independent from $n$, $O(k^2)$ becomes negligible and so the resulting complexity is $\theta(n)$.
 
 ## Exercise 3
 
@@ -280,7 +317,7 @@ def three_way_partition(A, i, j, pivot):
 enddef
 ```
 
-When all the elements in the array are the same, this method basically performs a linear scan of the partition we are considering. What still we need to do is to change _select_ algorithm in order to deal with the $2$ indexes returned by _three_way_partition_.
+What still we need to do is to change _select_ algorithm in order to deal with the $2$ indexes returned by _three_way_partition_.
 
 ```select
 def select(A, l=1, r=|A|, i):
@@ -303,4 +340,7 @@ def select(A, l=1, r=|A|, i):
     return select(A, right+1, r, i)
 ```
 
-In this way we are sure that the entire _select_ algorithm has a complexity of $O(n)$ as proved during lectures.
+Let's now think about the actual improvements that this approach comes with. It's interesting to notice that worst case scenario now becomes actually a best case scenario since when all the elements in the array are the same, this method basically performs only a linear scan and immediately returns (notice that both G and S have size $0$ in this case) the desired position we're looking for.
+Moreover, since the main problem is represented by duplicated values that are very likely to be the median of medians, by using this kind of partitioning we are discarding at each recursive iteration of _select_ all of those and so they no longer constitute a source of problem for the algorithm.
+
+In this way we are sure that the entire _select_ algorithm has a complexity of $O(n)$ even if there is a consistent presence of repeated values.
