@@ -103,14 +103,15 @@ Let $k$ be the total number of values in A that are different from $0$. The stra
 
 ``` imporved
 def improved(A, k):
-    AUX <- array(A.size, default = 0)
-    B <- array(A.size, default = 0)
+    AUX <- array(k, default = 0)
+    i_AUX <- 1
     zeros <- A.size - k 
     neg <- 0
 
     for i <- 1 to A.size:
         if A[i] != 0:
-            AUX[i] = A[i]
+            AUX[i_AUX] = A[i]
+            i_AUX <- i_AUX + 1
         endif
         if A[i] < 0:
             neg <- neg + 1
@@ -119,6 +120,7 @@ def improved(A, k):
 
     B_AUX = smallerThan(AUX)
     i_AUX <- 1
+    B <- array(A.size, default = 0)
 
     for i <- 1 to A.size:
         if A[i] > 0:
@@ -160,7 +162,7 @@ Let T be a Red-Black Tree.
 
 (a) Give the definition of Red-Black Trees.
 
-Red Black trees are Binary Search Trees satisfying the following conditions:
+Red Black Trees are Binary Search Trees satisfying the following conditions:
 
 * Each node is either a red or a black node
 * The tree's root is black
@@ -224,7 +226,7 @@ Consider the problem of lexicographically sorting $n$ pairs of integer values.
 
 (a) Suggest the opportune data structure to handle the pairs, write the pseudo-code of an efficient algorithm to solve the sorting problem and compute the complexity of the proposed procedure.
 
-A possible data structure to handle properly the pairs and provide a solution to the sorting problem could be an array of pairs. To do so an implementation of Lexicographical ordering is needed in order to pass it as total order of a sorting algorithm that work through comparison. Practically, these are the steps to follow:
+A possible data structure to handle properly the pairs and provide a solution to the sorting problem could be an array of pairs (where pairs could be implemented either as an array of 2 elements, the choice that I've taken, or defining a new complex datatype). To do so an implementation of Lexicographical ordering is needed in order to pass it as total order of a sorting algorithm that work through comparison. Practically, these are the steps to follow:
 
 ```sorting_lexico
 def lexicographical_order(a,b):
@@ -235,6 +237,8 @@ def soritng_lexicographically(A, lexicographical_order):
     return heapsort(A, total_order = lexicographical_order)
 enddef
 ```
+
+_Side note: here we are referring at heapsort implementation done during lectures._
 
 In the solution proposed above I used as sorting algorithm _heapsort_ (or equivalently it can be used _quicksort_ but there could be some problems concerning complexity in worst case scenarios) which has complexity $\in O(nlog(n))$, and actually is the best reachable time complexity for this kind of algorithms based on comparison (using _insertion sort_ for example would have produced same results but with worse complexity, $O(n^2)$).
 
@@ -258,7 +262,7 @@ def new_sorting_lexicographically(A, pair_order_a, pair_order_b):
 enddef
 ```
 
-It's clear that this additional information doesn't enhance complexity at all because the algorithm will still be bounded by the complexity of _heapsort_. To take a look at this consideration more in detail:
+It's clear that this additional information doesn't enhance complexity at all because the algorithm would still be bounded by the complexity of _heapsort_. To take a look at this consideration more in detail:
 $$T(n) = O(nlog(n)) + \theta(n + k) \in O(nlog(n))$$
 
 (c) Assume that the condition of Exercise 4b holds and that there exists a natural value $h$, constant with respect to $n$, such that $b_i \in [1, h]$ for all $i \in [1, n]$. Is there an algorithm to solve the sorting problem more efficient than the one proposed as solution for Exercise 4a? If this is the case, describe it and compute its complexity, otherwise, motivate the answer.
@@ -343,4 +347,4 @@ def select(A, l=1, r=|A|, i):
 Let's now think about the actual improvements that this approach comes with. It's interesting to notice that worst case scenario now becomes actually a best case scenario since when all the elements in the array are the same, this method basically performs only a linear scan and immediately returns (notice that both G and S have size $0$ in this case) the desired position we're looking for.
 Moreover, since the main problem is represented by duplicated values that are very likely to be the median of medians, by using this kind of partitioning we are discarding at each recursive iteration of _select_ all of those and so they no longer constitute a source of problem for the algorithm.
 
-In this way we are sure that the entire _select_ algorithm has a complexity of $O(n)$ even if there is a consistent presence of repeated values.
+In this way we ensure that the entire _select_ algorithm has a complexity of $O(n)$ even if there is a consistent presence of repeated values.
