@@ -53,6 +53,10 @@ class binheap(Generic[T]):
     def __len__(self):
         return self._size
 
+    # since a node has also a heap index that help us to keep track
+    # of it during dijkstra execution, when a key is swapped we need 
+    # also to exchange heap indexes of the two nodes
+
     def _swap_keys(self, node_a: int, node_b: int) -> None:
         tmp = self._A[node_a]
         self._A[node_a] = self._A[node_b]
@@ -116,10 +120,10 @@ class binheap(Generic[T]):
             self._size += 1
         else:
             parent = binheap.parent(self._size)
-            if self._torder(self._A[parent], value):
-                self._A[self._size] = value
+            if self._torder(self._A[parent].d, value):
+                self._A[self._size].d = value
             else:
-                self._A[self._size] = self._A[parent]
+                self._A[self._size].d = self._A[parent].d
                 
             self._size += 1
             self.decrease_key(self._size - 1, value)
