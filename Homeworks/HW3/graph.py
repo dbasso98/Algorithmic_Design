@@ -7,10 +7,10 @@ class Node:
         • the data contained in the node, actually is the distance
           from the source of the path
         • the predecessor
-        • the importance of a node in the graph
+        • the importance of a node in the graph, default value = 0
     """
 
-    def __init__(self, index, heap_idx, dist, pred, imp=None):
+    def __init__(self, index, heap_idx=None, dist=None, pred=None, imp=0):
         self.index = index
         self.heap_index = heap_idx
         self.d = dist
