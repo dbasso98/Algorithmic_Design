@@ -15,7 +15,7 @@ def RetrieveMax(H):
     mid <- floor(H.size/2)
     max <- mid
     for i <- mid + 1 to H.size:
-        if max < H[i]:
+        if H[max] < H[i]:
             max <- i
         endif
     endfor
@@ -42,7 +42,7 @@ def DeleteMax(H):
     i <- max
 
     while not (is_root(i) or H[parent(i)] <= H[i]):
-        swap(H, H[i], H[parent(i)])
+        swap(H, i, parent(i))
         i <- parent(i)
     endwhile
 enddef
